@@ -1,4 +1,11 @@
+import 'package:intl/intl.dart';
+
 enum Gender { male, female }
+
+enum Mode { flinnDate, flinnMate }
+
+final formatterNew = DateFormat.jm(); 
+final formatterOld = DateFormat.MMMd();
 
 class ChatUsers {
   const ChatUsers({
@@ -13,7 +20,7 @@ class ChatUsers {
   final String name;
   final String messageText;
   final String image;
-  final String time;
+  final DateTime time;
   final Gender gender;
   final int unreadMessages;
 }

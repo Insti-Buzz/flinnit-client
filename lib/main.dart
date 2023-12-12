@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 void main() {
   runApp(
     const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: TabsScreen(
         myName: 'Jujhar Singh Channa',
         myGender: Gender.male,

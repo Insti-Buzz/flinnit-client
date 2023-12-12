@@ -5,11 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AnonymousDrawer extends StatefulWidget {
-  const AnonymousDrawer(
-      {required this.myName, required this.myGender, super.key});
+  const AnonymousDrawer({
+    required this.myName,
+    required this.myGender,
+    required this.activeMode,
+    super.key,
+  });
 
   final String myName;
   final Gender myGender;
+  final Mode activeMode;
 
   @override
   State<AnonymousDrawer> createState() {
@@ -42,7 +47,11 @@ class _AnonymousDrawerState extends State<AnonymousDrawer> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Avatar(gender: widget.myGender),
+                    Avatar(
+                      mode: widget.activeMode,
+                      gender: widget.myGender,
+                      outerRadius: 22,
+                    ),
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
@@ -87,18 +96,20 @@ class _AnonymousDrawerState extends State<AnonymousDrawer> {
               buttonIcon: Icons.feedback_outlined,
             ),
             const Spacer(),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Build with RKP',
-                  style: GoogleFonts.amaranth(
-                      fontSize: 20,
-                      color: const Color.fromRGBO(97, 37, 112, 1)),
-                ),
-                const SizedBox(width: 2),
-                const Text('❤️')
-              ],
+            Text(
+              'Developed with ❤️',
+              style: GoogleFonts.amaranth(
+                fontSize: 20,
+                color: const Color.fromRGBO(97, 37, 112, 1),
+              ),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              'RKP',
+              style: GoogleFonts.amaranth(
+                fontSize: 20,
+                color: const Color.fromRGBO(97, 37, 112, 1),
+              ),
             ),
             Text(
               '2023 Version 2.0',

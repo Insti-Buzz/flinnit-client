@@ -1,8 +1,11 @@
+import 'package:flinnit/models/chat_users.dart';
 import 'package:flinnit/widgets/chat_list.dart';
 import 'package:flutter/material.dart';
 
 class AnonymousHome extends StatefulWidget {
-  const AnonymousHome({super.key});
+  const AnonymousHome({super.key, required this.activeMode});
+
+  final Mode activeMode;
 
   @override
   State<AnonymousHome> createState() {
@@ -25,7 +28,7 @@ class _AnonymousHomeState extends State<AnonymousHome> {
           end: Alignment.bottomCenter,
         ),
       ),
-      child: const ChatList(),
+      child: ChatList(activeMode: widget.activeMode),
     );
   }
 }

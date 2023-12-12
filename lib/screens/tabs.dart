@@ -1,10 +1,13 @@
 import 'package:flinnit/models/chat_users.dart';
+import 'package:flinnit/presentation/flinnit_icon_icons.dart';
 import 'package:flinnit/screens/anonymous_home.dart';
 import 'package:flinnit/screens/community_home.dart';
 import 'package:flinnit/screens/events_home.dart';
 import 'package:flinnit/widgets/anonymous_drawer.dart';
+import 'package:flinnit/widgets/avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flinnit/data/chat_users.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({
@@ -24,13 +27,20 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   var _selectedPageIndex = 0;
-  Widget activePage = const AnonymousHome();
+  late Widget activePage;
+  Mode activeMode = Mode.flinnMate;
 
-  void selectMode(index) {
+  @override
+  void initState() {
+    super.initState();
+    activePage = AnonymousHome(activeMode: activeMode);
+  }
+
+  void selectTab(index) {
     setState(() {
       _selectedPageIndex = index;
       if (_selectedPageIndex == 0) {
-        activePage = const AnonymousHome();
+        activePage = AnonymousHome(activeMode: activeMode);
       } else if (_selectedPageIndex == 1) {
         activePage = const CommunityHome();
       } else if (_selectedPageIndex == 2) {
@@ -39,12 +49,23 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  int get numberOfUnopenedChats {
+    int counter = 0;
+
+    for (int i = 0; i < chatUsers.length; i++) {
+      if (chatUsers[i].unreadMessages != 0) {
+        counter++;
+      }
+    }
+
+    return counter;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawerEdgeDragWidth: double.infinity,
       appBar: AppBar(
-        // toolbarHeight: 80,
         title: Text(
           'Flinnit',
           style: GoogleFonts.amaranth(
@@ -61,8 +82,6 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
           Container(
             padding: const EdgeInsets.all(2),
-            // height: 50,
-            // width: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: (widget.myGender == Gender.female)
@@ -70,14 +89,65 @@ class _TabsScreenState extends State<TabsScreen> {
                   : const Color.fromRGBO(69, 109, 209, 1),
             ),
             child: CircleAvatar(
-              // radius: 22,
               backgroundColor: Colors.white,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.emoji_emotions,
+              child: PopupMenuButton(
+                offset: Offset(-5, AppBar().preferredSize.height),
+                itemBuilder: (ctx) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      setState(() {
+                        activeMode = Mode.flinnDate;
+                        activePage = AnonymousHome(activeMode: activeMode);
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Avatar(
+                              mode: Mode.flinnDate,
+                              outerRadius: 16,
+                              gender: widget.myGender,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Flinn-Date',
+                              style: GoogleFonts.amaranth(fontSize: 20),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    onTap: () {
+                      setState(() {
+                        activeMode = Mode.flinnMate;
+                        activePage = AnonymousHome(activeMode: activeMode);
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Avatar(
+                          gender: widget.myGender,
+                          outerRadius: 16,
+                          mode: Mode.flinnMate,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Flinn-Mate',
+                          style: GoogleFonts.amaranth(fontSize: 20),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+                icon: Icon(
+                  (activeMode == Mode.flinnMate)
+                      ? Icons.emoji_emotions
+                      : Icons.heart_broken,
                   // size: 28,
                 ),
-                onPressed: () {},
               ),
             ),
           ),
@@ -99,6 +169,7 @@ class _TabsScreenState extends State<TabsScreen> {
         ),
       ),
       drawer: AnonymousDrawer(
+        activeMode: activeMode,
         myGender: widget.myGender,
         myName: widget.myName,
       ),
@@ -115,23 +186,73 @@ class _TabsScreenState extends State<TabsScreen> {
               ),
             )
           : null,
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: selectMode,
-        currentIndex: _selectedPageIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt),
-            label: 'Community',
+          boxShadow: [
+            BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(15.0),
+            topRight: Radius.circular(15.0),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Event',
+          child: BottomNavigationBar(
+            selectedIconTheme: const IconThemeData(size: 25),
+            unselectedIconTheme: const IconThemeData(size: 22),
+            selectedItemColor: Colors.white,
+            unselectedItemColor: const Color.fromRGBO(255, 141, 199, 1),
+            selectedFontSize: 0,
+            unselectedFontSize: 0,
+            backgroundColor: const Color.fromRGBO(152, 103, 197, 1),
+            onTap: selectTab,
+            currentIndex: _selectedPageIndex,
+            items: [
+              BottomNavigationBarItem(
+                icon: Stack(
+                  children: [
+                    const Icon(FlinnitIcon.teenyicons_chat_outline),
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 12,
+                          minHeight: 12,
+                        ),
+                        child: Text(
+                          numberOfUnopenedChats.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                label: '',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(FlinnitIcon.vector),
+                label: '',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(FlinnitIcon.vector__1_),
+                label: '',
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
